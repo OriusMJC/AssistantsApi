@@ -1,47 +1,50 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query } from "@nestjs/common";
-import { AssistantService } from "../services/assistant.service";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Query,
+} from '@nestjs/common';
+import { AssistantService } from '../services/assistant.service';
 
 @Controller('assistant')
 export class AssistantController {
-    constructor(
-        private readonly service: AssistantService
-    ) { }
+  constructor(private readonly service: AssistantService) {}
 
-    @Post('create')
-    @HttpCode(HttpStatus.OK)
-    async getHello(
-        @Body() body: any
-    ) {
-        return await this.service.createAssistant(body);
-    }
+  @Get()
+  getMati() {
+    return 'mati';
+  }
 
-    @Post('create-thread')
-    @HttpCode(HttpStatus.OK)
-    async createThread(
-        @Body() body: any
-    ) {
-        return await this.service.createThread(body);
-    }
+  @Post('create')
+  @HttpCode(HttpStatus.OK)
+  async getHello(@Body() body: any) {
+    return await this.service.createAssistant(body);
+  }
 
-    @Post('create-message')
-    @HttpCode(HttpStatus.OK)
-    async createMessage(
-        @Body() body: any
-    ) {
-        return await this.service.createMessage(body);
-    }
+  @Post('create-thread')
+  @HttpCode(HttpStatus.OK)
+  async createThread(@Body() body: any) {
+    return await this.service.createThread(body);
+  }
 
-    @Get('list-messages')
-    @HttpCode(HttpStatus.OK)
-    async listMessages(@Query('thread_id') paramValue: string) {
-        return await this.service.listMessages(paramValue);
-    }
+  @Post('create-message')
+  @HttpCode(HttpStatus.OK)
+  async createMessage(@Body() body: any) {
+    return await this.service.createMessage(body);
+  }
 
-    @Post('run-thread')
-    @HttpCode(HttpStatus.OK)
-    async runThread(
-        @Body() body: any
-    ) {
-        return await this.service.runThread(body);
-    }
+  @Get('list-messages')
+  @HttpCode(HttpStatus.OK)
+  async listMessages(@Query('thread_id') paramValue: string) {
+    return await this.service.listMessages(paramValue);
+  }
+
+  @Post('run-thread')
+  @HttpCode(HttpStatus.OK)
+  async runThread(@Body() body: any) {
+    return await this.service.runThread(body);
+  }
 }

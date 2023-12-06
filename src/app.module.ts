@@ -16,9 +16,7 @@ import { AssistantModule } from './assistant/assistant.module';
     forwardRef(() => AccessModule),
     forwardRef(() => AssistantModule),
   ],
-  controllers: [
-  ],
-  providers: [{ provide: APP_GUARD, useClass: AppGuard }]
+  controllers: [],
+  providers: [{ provide: APP_GUARD, useClass: AppGuard }],
 })
-
-export class AppModule { }
+export class AppModule {}
