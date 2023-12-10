@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import OpenAI from 'openai';
+import { Assistant } from 'src/schemas/assistant.schema';
 
 @Injectable()
 export class AssistantService {
   private apiSession: OpenAI;
-  constructor() {
+  constructor(@InjectModel(Assistant.name) private assistantModel: Model<Assistant>) {
     if (!process.env.OPENAI_API_KEY) {
       throw Error(
         '"OpenAI API key not configured, please follow instructions in README.md"',
@@ -15,11 +18,16 @@ export class AssistantService {
     });
   }
 
+  findAll(){
+    this.assistantModel.find();
+  }
+
   async createAssistant(input: any) {
     const assistant = await this.apiSession.beta.assistants.create({
       name: 'Asistente pro para doctores',
       description: input.description,
       model: 'gpt-4-1106-preview',
+      instructions: "",
       tools: [
         { type: 'code_interpreter' },
         {
@@ -40,52 +48,11 @@ export class AssistantService {
         },
       ],
     });
-
+    if(assistant){
+      await this.assistantModel.create({id: assistant?.id, description: input.description})
+    }
     return assistant;
   }
-
-  // async createThread(input: any) {
-  //   const thread = await this.apiSession.beta.threads.create({
-  //     messages: [
-  //       {
-  //         role: 'user',
-  //         content: input.content,
-  //       },
-  //     ],
-  //   });
-
-  //   return thread;
-  // }
-
-  // async createMessage(input) {
-  //   const message = await this.apiSession.beta.threads.messages.create(
-  //     input.threadId,
-  //     {
-  //       role: 'user',
-  //       content: input.content,
-  //     },
-  //   );
-
-  //   return message;
-  // }
-
-  // async listMessages(thread_id: string) {
-  //   const messages = await this.apiSession.beta.threads.messages.list(
-  //     thread_id,
-  //   );
-
-  //   return messages;
-  // }
-
-  // async runThread(input: any) {
-  //   const run = await this.apiSession.beta.threads.runs.create(input.threadId, {
-  //     assistant_id: input.assistantId,
-  //     model: 'gpt-4-1106-preview',
-  //     // instructions: "additional instructions",
-  //     tools: [{ type: 'code_interpreter' }, { type: 'retrieval' }],
-  //   });
-  //   return run;
-  // }
 
   async interactWithAssistant(input: any) {
     // Puedes validar que el input contenga el ID del asistente y el mensaje
@@ -138,3 +105,46 @@ export class AssistantService {
     return {assistantId: input.assistantId, threadId: run?.thread_id, messages: messages?.data[0]};
   }
 }
+  // async createThread(input: any) {
+  //   const thread = await this.apiSession.beta.threads.create({
+  //     messages: [
+  //       {
+  //         role: 'user',
+  //         content: input.content,
+  //       },
+  //     ],
+  //   });
+
+  //   return thread;
+  // }
+
+  // async createMessage(input) {
+  //   const message = await this.apiSession.beta.threads.messages.create(
+  //     input.threadId,
+  //     {
+  //       role: 'user',
+  //       content: input.content,
+  //     },
+  //   );
+
+  //   return message;
+  // }
+
+  // async listMessages(thread_id: string) {
+  //   const messages = await this.apiSession.beta.threads.messages.list(
+  //     thread_id,
+  //   );
+
+  //   return messages;
+  // }
+
+  // async runThread(input: any) {
+  //   const run = await this.apiSession.beta.threads.runs.create(input.threadId, {
+  //     assistant_id: input.assistantId,
+  //     model: 'gpt-4-1106-preview',
+  //     // instructions: "additional instructions",
+  //     tools: [{ type: 'code_interpreter' }, { type: 'retrieval' }],
+  //   });
+  //   return run;
+  // }
+
