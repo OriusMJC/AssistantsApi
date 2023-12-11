@@ -5,23 +5,51 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Delete,
   Query,
+  Param
 } from '@nestjs/common';
 import { AssistantService } from '../services/assistant.service';
+import { CreateAssistantDTO } from 'src/dto/assistant/create-assistant.dto';
 
 @Controller('assistant')
 export class AssistantController {
-  constructor(private readonly service: AssistantService) {}
+  constructor(private assistantService: AssistantService) {}
 
   @Get()
-  getMati() {
-    return 'mati';
+  @HttpCode(HttpStatus.OK)
+  findAll() {
+    return this.assistantService.findAll();
+  }
+
+  @Get(":id")
+  @HttpCode(HttpStatus.OK)
+  findOne(@Param('id') id:string) {
+    return this.assistantService.findOne(id);
+  }
+
+  @Delete(":id")
+  @HttpCode(HttpStatus.OK)
+  delete(@Param('id') id:string) {
+    return this.assistantService.delete(id);
   }
 
   @Post('create')
   @HttpCode(HttpStatus.OK)
-  async getHello(@Body() body: any) {
-    return await this.service.createAssistant(body);
+  async create(@Body() body: CreateAssistantDTO) {
+    return await this.assistantService.createAssistant(body);
+  }
+
+  
+  @Post('interaction')
+  @HttpCode(HttpStatus.OK)
+  async interactWithAssistant(@Body() body: any) {
+    try {
+      const response = await this.assistantService.interactWithAssistant(body);
+      return { success: true, data: response };
+    } catch (error) {
+      return { success: false, error: 'Error interacting with the assistant.' };
+    }
   }
 
   // @Post('create-thread')
@@ -47,15 +75,4 @@ export class AssistantController {
   // async runThread(@Body() body: any) {
   //   return await this.service.runThread(body);
   // }
-
-  @Post('interaction')
-  @HttpCode(HttpStatus.OK)
-  async interactWithAssistant(@Body() body: any) {
-    try {
-      const response = await this.service.interactWithAssistant(body);
-      return { success: true, data: response };
-    } catch (error) {
-      return { success: false, error: 'Error interacting with the assistant.' };
-    }
-  }
 }

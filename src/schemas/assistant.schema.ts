@@ -9,7 +9,19 @@ export class Assistant {
     required: true,
     trim: true,
   })
-  id: string;
+  OpenaiID: string;
+
+  @Prop({
+    required: true,
+    trim: true,
+  })
+  name: string;
+
+  @Prop({
+    required: true,
+    trim: true,
+  })
+  instructions: string;
 
   @Prop({
     trim: true,
@@ -21,7 +33,14 @@ export class Assistant {
     required: true,
     trim: true,
   })
-  userId: string;
+  GoogleCalendarID: string;
+
+  @Prop({
+    unique: true,
+    required: true,
+    trim: true,
+  })
+  doctorId: string;
 }
 
 export const AssistantSchema = SchemaFactory.createForClass(Assistant);

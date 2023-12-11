@@ -3,6 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import OpenAI from 'openai';
 import { Assistant } from 'src/schemas/assistant.schema';
+import { CreateAssistantDTO } from 'src/dto/assistant/create-assistant.dto';
+import { UpdateAssistantDTO } from 'src/dto/assistant/update-assistant.dto';
 
 @Injectable()
 export class AssistantService {
@@ -18,16 +20,42 @@ export class AssistantService {
     });
   }
 
-  findAll(){
-    this.assistantModel.find();
+  async findAll(){
+    // const allAssistants = await this.assistantModel.find();
+    const assistants = await this.apiSession.beta.assistants.list();
+    // return allAssistants;
+    return assistants;
   }
 
-  async createAssistant(input: any) {
+  async findOne(id:string){
+    const assistants = await this.apiSession.beta.assistants.list();
+    const assistant = assistants.data.filter((a)=> a.id === id);
+    // const assistant = await this.assistantModel.findById(id);
+    return assistant;
+  }
+
+  async delete(id:string){
+    // const assistants = await this.apiSession.beta.assistants.list();
+    // for (const assistant of assistants.data) {
+    //   await this.apiSession.beta.assistants.del(assistant.id);
+    //   console.log("Se borro: ", assistant.id);
+    // }
+    // return 'se hizo'
+    const assistantDeleted = await this.assistantModel.findByIdAndDelete(id);
+    await this.apiSession.beta.assistants.del(assistantDeleted.OpenaiID);
+    return assistantDeleted;
+  }
+
+  async updated(id:string, assistant:UpdateAssistantDTO){
+    return this.assistantModel.findByIdAndUpdate(id, assistant);
+  }
+
+  async createAssistant(input: CreateAssistantDTO) {
     const assistant = await this.apiSession.beta.assistants.create({
-      name: 'Asistente pro para doctores',
+      name: input.name || 'Asistente pro para doctores',
       description: input.description,
       model: 'gpt-4-1106-preview',
-      instructions: "",
+      instructions: input.instructions || '',
       tools: [
         { type: 'code_interpreter' },
         {
@@ -40,7 +68,7 @@ export class AssistantService {
               type: 'object',
               properties: {
                 calendar: {
-                  id: 'string',
+                  id: input.GoogleCalendarID || 'string',
                 },
               },
             },
@@ -49,7 +77,7 @@ export class AssistantService {
       ],
     });
     if(assistant){
-      await this.assistantModel.create({id: assistant?.id, description: input.description})
+      await this.assistantModel.create({OpenaiID: assistant?.id, ...input})
     }
     return assistant;
   }
