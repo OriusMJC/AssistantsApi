@@ -60,28 +60,4 @@ export class AssistantController {
       return { success: false, error: 'Error interacting with the assistant.' };
     }
   }
-
-  // @Post('create-thread')
-  // @HttpCode(HttpStatus.OK)
-  // async createThread(@Body() body: any) {
-  //   return await this.service.createThread(body);
-  // }
-
-  // @Post('create-message')
-  // @HttpCode(HttpStatus.OK)
-  // async createMessage(@Body() body: any) {
-  //   return await this.service.createMessage(body);
-  // }
-
-  // @Get('list-messages')
-  // @HttpCode(HttpStatus.OK)
-  // async listMessages(@Query('thread_id') paramValue: string) {
-  //   return await this.service.listMessages(paramValue);
-  // }
-
-  // @Post('run-thread')
-  // @HttpCode(HttpStatus.OK)
-  // async runThread(@Body() body: any) {
-  //   return await this.service.runThread(body);
-  // }
 }

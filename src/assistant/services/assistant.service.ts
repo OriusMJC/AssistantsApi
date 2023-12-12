@@ -6,10 +6,12 @@ import { Assistant } from 'src/schemas/assistant.schema';
 import { CreateAssistantDTO } from 'src/dto/assistant/create-assistant.dto';
 import { UpdateAssistantDTO } from 'src/dto/assistant/update-assistant.dto';
 import { InteractionAssistantDTO } from 'src/dto/assistant/interaction-assistant.dto';
+import { Thread } from 'src/schemas/thread.schema';
 
 @Injectable()
 export class AssistantService {
   private apiSession: OpenAI;
+  private threadModel: Model<Thread>;
   constructor(@InjectModel(Assistant.name) private assistantModel: Model<Assistant>) {
     if (!process.env.OPENAI_API_KEY) {
       throw Error(
@@ -102,6 +104,7 @@ export class AssistantService {
         ],
       });
       threadId = thread.id;
+      await this.threadModel.create({threaId: threadId, userId: input.userId, assistantId: input.assistantId})
     } else {
       // Si hay un ID de hilo, agrega el nuevo mensaje al hilo existente
       await this.apiSession.beta.threads.messages.create(threadId, {

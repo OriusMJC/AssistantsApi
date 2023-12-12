@@ -3,28 +3,25 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 @Schema({
   timestamps: true,
 })
-export class User {
+export class Thread {
+  @Prop({
+    unique: true,
+    required: true,
+    trim: true,
+  })
+  threadId: string;
+
   @Prop({
     required: true,
     trim: true,
   })
-  name: string;
+  userId: string;
 
   @Prop({
     required: true,
     trim: true,
   })
-  email: string;
-
-  @Prop({
-    trim: true,
-  })
-  GoogleCalendarID: string;
-
-  @Prop({
-    required: false,
-  })
-  AssistantIDs: string[];
+  assistantId: string;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const ThreadSchema = SchemaFactory.createForClass(Thread);
