@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { APP_GUARD } from '@nestjs/core';
 import { AppGuard } from './access/guards/app.guard';
 import { AssistantModule } from './assistant/assistant.module';
-import { DoctorModule } from './doctor/doctor.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -16,7 +16,7 @@ import { DoctorModule } from './doctor/doctor.module';
     MongooseModule.forRoot(process.env.MONGODB_URI),
     forwardRef(() => AccessModule),
     forwardRef(() => AssistantModule),
-    forwardRef(() => DoctorModule),
+    forwardRef(() => UserModule),
   ],
   controllers: [],
   providers: [{ provide: APP_GUARD, useClass: AppGuard }],

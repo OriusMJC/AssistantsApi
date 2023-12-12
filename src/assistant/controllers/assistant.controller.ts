@@ -7,10 +7,12 @@ import {
   Post,
   Delete,
   Query,
-  Param
+  Param,
+  Put
 } from '@nestjs/common';
 import { AssistantService } from '../services/assistant.service';
 import { CreateAssistantDTO } from 'src/dto/assistant/create-assistant.dto';
+import { UpdateAssistantDTO } from 'src/dto/assistant/update-assistant.dto';
 
 @Controller('assistant')
 export class AssistantController {
@@ -34,7 +36,13 @@ export class AssistantController {
     return this.assistantService.delete(id);
   }
 
-  @Post('create')
+  @Put(':id')
+  @HttpCode(HttpStatus.OK)
+  async update(@Param('id') id:string, @Body() body: UpdateAssistantDTO) {
+    return await this.assistantService.updated(id, body);
+  }
+
+  @Post()
   @HttpCode(HttpStatus.OK)
   async create(@Body() body: CreateAssistantDTO) {
     return await this.assistantService.createAssistant(body);
