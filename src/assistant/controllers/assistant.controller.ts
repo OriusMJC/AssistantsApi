@@ -13,6 +13,7 @@ import {
 import { AssistantService } from '../services/assistant.service';
 import { CreateAssistantDTO } from 'src/dto/assistant/create-assistant.dto';
 import { UpdateAssistantDTO } from 'src/dto/assistant/update-assistant.dto';
+import { InteractionAssistantDTO } from 'src/dto/assistant/interaction-assistant.dto';
 
 @Controller('assistant')
 export class AssistantController {
@@ -51,7 +52,7 @@ export class AssistantController {
   
   @Post('interaction')
   @HttpCode(HttpStatus.OK)
-  async interactWithAssistant(@Body() body: any) {
+  async interactWithAssistant(@Body() body: InteractionAssistantDTO) {
     try {
       const response = await this.assistantService.interactWithAssistant(body);
       return { success: true, data: response };

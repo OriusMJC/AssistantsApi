@@ -5,6 +5,7 @@ import OpenAI from 'openai';
 import { Assistant } from 'src/schemas/assistant.schema';
 import { CreateAssistantDTO } from 'src/dto/assistant/create-assistant.dto';
 import { UpdateAssistantDTO } from 'src/dto/assistant/update-assistant.dto';
+import { InteractionAssistantDTO } from 'src/dto/assistant/interaction-assistant.dto';
 
 @Injectable()
 export class AssistantService {
@@ -82,7 +83,7 @@ export class AssistantService {
     return assistant;
   }
 
-  async interactWithAssistant(input: any) {
+  async interactWithAssistant(input: InteractionAssistantDTO) {
     // Puedes validar que el input contenga el ID del asistente y el mensaje
     if (!input.assistantId || !input.message) {
       throw Error('Invalid input. Please provide assistantId and message.');
