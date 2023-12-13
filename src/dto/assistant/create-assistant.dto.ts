@@ -19,5 +19,5 @@ export class CreateAssistantDTO {
   
   @IsString()
   @IsNotEmpty()
-  doctorId: string;
+  userId: string;
 }

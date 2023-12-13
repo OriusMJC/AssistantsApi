@@ -7,6 +7,8 @@ import { CreateAssistantDTO } from 'src/dto/assistant/create-assistant.dto';
 import { UpdateAssistantDTO } from 'src/dto/assistant/update-assistant.dto';
 import { InteractionAssistantDTO } from 'src/dto/assistant/interaction-assistant.dto';
 import { Thread } from 'src/schemas/thread.schema';
+import { CreateThreadDTO } from 'src/dto/thread/create-thread.dto';
+import { MessageContentText } from 'openai/resources/beta/threads/messages/messages';
 
 @Injectable()
 export class AssistantService {
@@ -24,10 +26,10 @@ export class AssistantService {
   }
 
   async findAll(){
-    // const allAssistants = await this.assistantModel.find();
-    const assistants = await this.apiSession.beta.assistants.list();
-    // return allAssistants;
-    return assistants;
+    const allAssistants = await this.assistantModel.find();
+    // const assistants = await this.apiSession.beta.assistants.list();
+    return allAssistants;
+    // return assistants;
   }
 
   async findOne(id:string){
@@ -104,7 +106,10 @@ export class AssistantService {
         ],
       });
       threadId = thread.id;
-      await this.threadModel.create({threaId: threadId, userId: input.userId, assistantId: input.assistantId})
+      // console.log("Llega hasta aca", threadId)
+      // const newThread:CreateThreadDTO = {threadId: threadId, userId: input.userId, assistantId: input.assistantId};
+      // let threadDb = await this.threadModel.create(newThread)
+      // console.log("Y tmb Llega hasta aca", threadDb)
     } else {
       // Si hay un ID de hilo, agrega el nuevo mensaje al hilo existente
       await this.apiSession.beta.threads.messages.create(threadId, {
@@ -120,21 +125,34 @@ export class AssistantService {
       // max_tokens: 50,
     });
     if(!run) return null
-    let messages = await this.apiSession.beta.threads.messages.list(threadId);
-    // console.log(messages.data)
-    const maxAttempts = 20;
-    let attempts = 0;
-    while (messages?.data[0]?.role !== 'assistant' && attempts < maxAttempts) {
-      // Espera un tiempo antes de realizar la siguiente solicitud
-      await new Promise(resolve => setTimeout(resolve, 100));
-  
-      // Realiza la solicitud para obtener los mensajes actualizados
-      messages = await this.apiSession.beta.threads.messages.list(threadId);
-      
-      attempts++;
-    }
 
+    let messages = await this.apiSession.beta.threads.messages.list(threadId);
+
+    const maxAttempts = 50;
+    let attempts = 0;
+    if(messages && 'text' in messages.data[0].content[0]){
+      const textContent = messages.data[0].content[0] as MessageContentText;
+      // console.log("ENtra al IF", String(textContent.text.value))
+      while (messages?.data[0]?.role !== 'assistant' || String(textContent.text.value).length === 0 ) {
+        // Espera un tiempo antes de realizar la siguiente solicitud
+        await new Promise(resolve => setTimeout(resolve, 100));
+        // console.log("Entro al while", messages?.data[0]?.role, textContent.text.value)
+        // Realiza la solicitud para obtener los mensajes actualizados
+        messages = await this.apiSession.beta.threads.messages.list(threadId);
+        
+        // attempts++;
+      }
+    }
+  
     return {assistantId: input.assistantId, threadId: run?.thread_id, messages: messages?.data[0]};
+  }
+  
+  async listMessages(thread_id: string) {
+    const messages = await this.apiSession.beta.threads.messages.list(
+      thread_id,
+    );
+  
+    return messages;
   }
 }
   // async createThread(input: any) {
@@ -162,13 +180,6 @@ export class AssistantService {
   //   return message;
   // }
 
-  // async listMessages(thread_id: string) {
-  //   const messages = await this.apiSession.beta.threads.messages.list(
-  //     thread_id,
-  //   );
-
-  //   return messages;
-  // }
 
   // async runThread(input: any) {
   //   const run = await this.apiSession.beta.threads.runs.create(input.threadId, {

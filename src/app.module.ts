@@ -6,6 +6,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AppGuard } from './access/guards/app.guard';
 import { AssistantModule } from './assistant/assistant.module';
 import { UserModule } from './user/user.module';
+import { ThreadModule } from './thread/thread.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UserModule } from './user/user.module';
     forwardRef(() => AccessModule),
     forwardRef(() => AssistantModule),
     forwardRef(() => UserModule),
+    forwardRef(() => ThreadModule),
   ],
   controllers: [],
   providers: [{ provide: APP_GUARD, useClass: AppGuard }],

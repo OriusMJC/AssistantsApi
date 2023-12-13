@@ -40,7 +40,7 @@ export class Assistant {
     required: true,
     trim: true,
   })
-  doctorId: string;
+  userId: string;
 }
 
 export const AssistantSchema = SchemaFactory.createForClass(Assistant);

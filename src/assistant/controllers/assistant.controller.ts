@@ -14,6 +14,7 @@ import { AssistantService } from '../services/assistant.service';
 import { CreateAssistantDTO } from 'src/dto/assistant/create-assistant.dto';
 import { UpdateAssistantDTO } from 'src/dto/assistant/update-assistant.dto';
 import { InteractionAssistantDTO } from 'src/dto/assistant/interaction-assistant.dto';
+import { threadId } from 'worker_threads';
 
 @Controller('assistant')
 export class AssistantController {
@@ -23,6 +24,11 @@ export class AssistantController {
   @HttpCode(HttpStatus.OK)
   findAll() {
     return this.assistantService.findAll();
+  }
+  @Get('list/:threadId')
+  @HttpCode(HttpStatus.OK)
+  getListMessage(@Param("threadId") threadId:string) {
+    return this.assistantService.listMessages(threadId);
   }
 
   @Get(":id")
