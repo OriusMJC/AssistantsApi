@@ -7,6 +7,7 @@ import { AppGuard } from './access/guards/app.guard';
 import { AssistantModule } from './assistant/assistant.module';
 import { UserModule } from './user/user.module';
 import { ThreadModule } from './thread/thread.module';
+import { CalendarModule } from './calendar/calendar.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ThreadModule } from './thread/thread.module';
     forwardRef(() => AssistantModule),
     forwardRef(() => UserModule),
     forwardRef(() => ThreadModule),
+    forwardRef(() => CalendarModule),
   ],
   controllers: [],
   providers: [{ provide: APP_GUARD, useClass: AppGuard }],

@@ -73,7 +73,7 @@ export class AssistantService {
               type: 'object',
               properties: {
                 calendar: {
-                  id: input.GoogleCalendarID || 'string',
+                  id: input.GoogleCalendarID || '373920759873-cq5mmnide6lrklvpbda0ftk01do75ul4.apps.googleusercontent.com',
                 },
               },
             },
@@ -121,7 +121,22 @@ export class AssistantService {
     const run = await this.apiSession.beta.threads.runs.create(threadId, {
       assistant_id: input.assistantId,
       model: 'gpt-4-1106-preview',
-      tools: [{ type: 'code_interpreter' }, { type: 'retrieval' }],
+      tools: [{ type: 'code_interpreter' }, { type: 'retrieval' },{
+        type: 'function',
+        function: {
+          name: 'getDoctorGoogleCalendar',
+          description:
+            "Get doctor's google calendar in order to check availability",
+          parameters: {
+            type: 'object',
+            properties: {
+              calendar: {
+                id: '373920759873-cq5mmnide6lrklvpbda0ftk01do75ul4.apps.googleusercontent.com',
+              },
+            },
+          },
+        },
+      },],
       // max_tokens: 50,
     });
     if(!run) return null
@@ -131,8 +146,8 @@ export class AssistantService {
     const maxAttempts = 50;
     let attempts = 0;
     if(messages && 'text' in messages.data[0].content[0]){
-      const textContent = messages.data[0].content[0] as MessageContentText;
-      // console.log("ENtra al IF", String(textContent.text.value))
+      let textContent = messages.data[0].content[0] as MessageContentText;
+      console.log("ENtra al IF", String(textContent.text.value))
       while (messages?.data[0]?.role !== 'assistant' || String(textContent.text.value).length === 0 ) {
         // Espera un tiempo antes de realizar la siguiente solicitud
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -143,7 +158,7 @@ export class AssistantService {
         // attempts++;
       }
     }
-  
+    console.log("MESSAGE: ", messages?.data[0].content[0])
     return {assistantId: input.assistantId, threadId: run?.thread_id, messages: messages?.data[0]};
   }
   
