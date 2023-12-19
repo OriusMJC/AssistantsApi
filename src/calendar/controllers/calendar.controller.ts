@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { CalendarService } from '../services/calendar.service';
 import { CreateEventDto } from 'src/dto/calendar/create-event.dto';
 
@@ -6,14 +6,25 @@ import { CreateEventDto } from 'src/dto/calendar/create-event.dto';
 export class CalendarController {
   constructor(private readonly calendarService: CalendarService) {}
 
+  @Get('/oauth2callback')
+  async handleOAuth2Callback(@Query('code') code: string) {
+    await this.calendarService.handleOAuth2Callback(code);
+    console.log("callback")
+    return { message: 'Authorization successful' };
+  }
+  
   @Post('event')
   async createEvent(@Body() event: CreateEventDto) {
-    await this.calendarService.createEvent(event);
+    console.log("post event")
+    let response = await this.calendarService.createEvent(event);
+    return {response: response}
   }
 
-  @Get('events')
+  @Get('')
   async getEvents() {
-    return this.calendarService.getEvents();
+    let response = await this.calendarService.getEvents();
+    console.log("events response: ",response);
+    return {response: response}
   }
 }
 
