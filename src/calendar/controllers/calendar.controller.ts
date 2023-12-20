@@ -18,9 +18,9 @@ export class CalendarController {
     return { message: 'Authorization successful' };
   }
   
-  @Post('event')
-  async createEvent(@Body() event: CreateEventDto) {
-    let response = await this.calendarService.createEvent(event);
+  @Post('event/:userId')
+  async createEvent(@Body() event: CreateEventDto, @Param('userId') userId:string) {
+    let response = await this.calendarService.createEvent(event, userId);
     return {response: response}
   }
 

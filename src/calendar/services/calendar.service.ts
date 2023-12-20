@@ -122,7 +122,8 @@ export class CalendarService {
     return responseEvents;
   }
 
-  async createEvent(event): Promise<void> {
+  async createEvent(event, userId:string): Promise<void> {
+    await this.authorize(userId);
     const calendar = google.calendar({ version: 'v3', auth: this.auth });
     const newEvent = {
       calendarId: 'primary',
