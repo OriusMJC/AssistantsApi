@@ -8,7 +8,6 @@ import { InjectModel } from '@nestjs/mongoose';
 @Injectable()
 export class CalendarService {
   private readonly SCOPES = ['https://www.googleapis.com/auth/calendar'];
-  private readonly TOKEN_PATH = 'token.json';
   private auth: OAuth2Client;
   @InjectModel(User.name) private user: Model<User>
   private actualUser: User;

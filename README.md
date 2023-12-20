@@ -77,20 +77,20 @@ Nest is [MIT licensed](LICENSE).
 
 ### GET Calendar:
 
-get a "/calendar/:userId" 
+**GET** a ``` /calendar/:userId ```
 
-si es la primera vez que el usuario Doctor hace peticion del Calendar significa que no tiene el Totke. Si no tenes el token de Calendar activado entonces ese Endpoint te devuelve un URL
+si es la primera vez que el usuario Doctor hace peticion del Calendar significa que no tiene el Totke. Si no tenes el token de Calendar activado entonces ese Endpoint te devuelve un **URL**
 
-entras a la URL y aceptas los permisos con tu cuenta de Google. 
+entras a la **URL** y aceptas los permisos con tu cuenta de Google. 
 
-Eso devolverá un codigo el cual tienes que insertar en un POST a:
-"/calendar/token?userId=:userID&code=:codigo" y esto guardará el Token.
+Eso devolverá un codigo el cual tienes que insertar en un **POST** a:
+``` /calendar/token?userId={userID}&code={codigo} ``` y esto guardará el Token.
 
-Ahora puedes hacer un GET a "calendar/:userId" y te devolverá la lista de eventos del Doctor usuario.
+Ahora puedes hacer un **GET** a ``` /calendar/:userId ``` y te devolverá la lista de eventos del Doctor usuario.
 
 ### POST Event
 
-Para postear un Evento haz un POST a "/calendar/event/:userId" y este un ejemplo del JSON que hay que enviar por body:
+Para postear un Evento haz un **POST** a ``` /calendar/event/:userId ``` y este un ejemplo del **JSON** que hay que enviar por **BODY**:
 
 ```
 {
