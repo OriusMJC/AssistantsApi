@@ -17,9 +17,32 @@ export class User {
   email: string;
 
   @Prop({
-    trim: true,
+    required: true,
+    type: Object
   })
-  GoogleCalendarID: string;
+  GCCredentials: {
+    web: {
+      client_id: string,
+      project_id: string,
+      auth_uri: string,
+      token_uri: string,
+      auth_provider_x509_cert_url: string,
+      client_secret: string,
+      redirect_uris: string[],
+      javascript_origins: string[]
+    }
+  }
+
+  @Prop({
+    type: Object,
+  })
+  GCToken: {
+    access_token: string,
+    refresh_token: string,
+    scope: string,
+    token_type: string,
+    expiry_date: number
+  } | any
 
   @Prop({
     required: false,
