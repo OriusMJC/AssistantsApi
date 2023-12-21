@@ -72,6 +72,71 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 Nest is [MIT licensed](LICENSE).
 
+## Assistant
+
+### Crear un asistente
+
+❗Tienes que tener un usuario Doctor creado
+
+**POST** a ```/assistant```
+ejemplo de body:
+
+```
+{
+	"name": "Nombre del asistente",
+	"instructions": "Prompt adicional",
+	"userId": "ID del usuario"
+}
+```
+
+Ten en cuenta que el asistente ya está creado con un Prompt Main el cual es suficiente para funcionar con los servicios del Calendario. Esto es simplemente por si se le quiere añadir información extra o darle alguna personalidad.
+
+### Interactuar con el Asistente
+
+❗Tienes que tener un usuario Doctor y asistente creado
+
+
+❗En el primer mensaje no es necesario tener el ID del Hilo de conversacion, pero si se quiere mantener la conversacion, en los siguientes post es necesario pasarle el ID del Hilo (threadId)
+
+El hilo de conversación se obtiene en la respuesta del Primer mensaje.
+
+**POST** a ```/assistant/interaction```
+
+ejemplo de body:
+
+```
+{
+	"assistantId": "ID del asistente",
+	"message": "mensaje para el asistente",
+	"userId": "ID del usuario",
+	"threadId": "ID del Hilo de conversación"
+}
+```
+
+una vez hecho el **POST** es necesario hacer el siguiente **GET** ```Listar la conversación entera``` para obtener la conversación y que en caso de haber pedido una accion como la de Agendar una cita, la acción se cumpla.
+
+
+### Listar la conversación entera 
+
+❗Tienes que tener el ID del hilo de conversación
+
+
+El hilo de conversación se obtiene en la respuesta del Primer mensaje.
+
+**GET** a ```/assistant/list/:threadId/:userId```
+
+Tienes que reemplazar ```threadId``` y ```userId``` por los valores correspondientes.
+
+
+### Obtener todos los asistentes o uno específico
+
+**GET** a ```/assistant```
+**GET** a ```/assistant/:assistantId``` 
+
+❗ID del asistente no obligatorio
+
+
+
 
 ## Calendar: 
 
@@ -98,11 +163,11 @@ Para postear un Evento haz un **POST** a ``` /calendar/event/:userId ``` y este 
   "location": "Buenos Aires, Argentina",
   "description": "Esta es una reunión de prueba creada desde la API de Google Calendar.",
   "start": {
-    "dateTime": "2023-12-29T10:00:00-07:00",
+    "dateTime": "2023-12-29T10:00:00-03:00",
     "timeZone": "America/Argentina/Buenos_Aires"
   },
   "end": {
-    "dateTime": "2023-12-29T11:00:00-07:00",
+    "dateTime": "2023-12-29T11:00:00-03:00",
     "timeZone": "America/Argentina/Buenos_Aires"
   },
   "attendees": [
