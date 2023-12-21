@@ -13,7 +13,7 @@ export class UpdateAssistantDTO {
   @IsOptional()
   description?: string;
   
-  @IsString()
-  @IsOptional()
-  GoogleCalendarID?: string;
+  // @IsString()
+  // @IsOptional()
+  // GoogleCalendarID?: string;
 }

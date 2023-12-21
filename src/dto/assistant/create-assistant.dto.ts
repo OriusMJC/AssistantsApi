@@ -13,9 +13,9 @@ export class CreateAssistantDTO {
   @IsOptional()
   description?: string;
   
-  @IsString()
-  @IsNotEmpty()
-  GoogleCalendarID: string;
+  // @IsString()
+  // @IsNotEmpty()
+  // GoogleCalendarID: string;
   
   @IsString()
   @IsNotEmpty()

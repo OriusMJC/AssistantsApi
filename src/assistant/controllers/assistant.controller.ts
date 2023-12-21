@@ -25,10 +25,10 @@ export class AssistantController {
   findAll() {
     return this.assistantService.findAll();
   }
-  @Get('list/:threadId')
+  @Get('list/:threadId/:userId')
   @HttpCode(HttpStatus.OK)
-  getListMessage(@Param("threadId") threadId:string) {
-    return this.assistantService.listMessages(threadId);
+  getListMessage(@Param("threadId") threadId:string, @Param("userId") userId:string) {
+    return this.assistantService.listMessages(threadId, userId);
   }
 
   @Get(":id")

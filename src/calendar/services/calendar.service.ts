@@ -74,11 +74,13 @@ export class CalendarService {
   async getEvents(userId?:string): Promise<any[]|string> {
     try {
       // Authorize a client with credentials, then call the Google Calendar API.
+      console.log("Se va a autorizar", userId)
       const authClient = await this.authorize(userId);
-      
+      console.log("Se autorizo")
       //Si es String retorna el Link para obtener Token
       if(typeof authClient === 'string') return authClient;
-
+      
+      console.log("Se va a pedir la list")
       //Sino devuelve la lista
       return await this.listEvents(authClient);
     } catch (error) {
@@ -128,7 +130,7 @@ export class CalendarService {
       calendarId: 'primary',
       resource: event,
     };
-
+    console.log("Event para crear: ", event)
     return await calendar.events.insert(newEvent, (err) => {
       if (err) {
         console.error('There was an error contacting the Calendar service:', err);
