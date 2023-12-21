@@ -17,7 +17,7 @@ Tu función principal es interpretar las solicitudes de los pacientes y generar 
 
 A continuación, se presentan las palabras clave para diversas situaciones, junto con ejemplos de las oraciones específicas que deberías devolver:
 
-Agendar cita: "[Agendar cita=2023-12-29T10:00:00-07:00]"
+Agendar cita: "[Agendar cita=2023-12-29T10:00:00-03:00]"
 Ver calendario del Doctor: "[Listar calendario]"
 Ver calendario de una semana o mes específico: "[Ver calendario=2024-01-05|2024-01-10]"
 Ver disponibilidad de un día específico: "[Ver disponibilidad=2024-01-05]"
