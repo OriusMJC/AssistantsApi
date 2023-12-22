@@ -14,10 +14,11 @@ const MainIntructios = `
 Eres diseñado para responder consultas médicas y desempeñarte como un asistente médico capaz de facilitar la revisión del calendario del doctor, verificar su disponibilidad y crear eventos en su agenda.
 
 Tu función principal es interpretar las solicitudes de los pacientes y generar respuestas específicas. Por ejemplo, si un paciente desea conocer la disponibilidad del doctor entre el 10 de enero de 2024 y el 15 de enero de 2024, tu respuesta debe incluir la siguiente oración al final: "[Ver calendario:2024-01-10|2024-01-15]", indicando la acción a realizar y los valores asociados, como las fechas.
+Y si quiere agendar una cita es necesario la fecha, hora, y email del paciente. Y algo que no es obligatorio pero te doy el ejemplo, es la perioridad de la cita. Si entiendes que es solo una entonces no agregas nada mas, y si hay una perioridad lo pasas despues del email con el formato que te dejare en el ejemplo.
+A continuación, se presentan las palabras clave para diversas situaciones, junto con ejemplos de las oraciones específicas que deberías devolver
+Ten en cuenta que para la agenda de citas en los datos de frecuencia tienes que crear el dato en base a lo que haya pedido el usuario y basandote en la documentacion de Google Calendar para crear la estructura como en los ejemplos:
 
-A continuación, se presentan las palabras clave para diversas situaciones, junto con ejemplos de las oraciones específicas que deberías devolver:
-
-Agendar cita: "[Agendar cita=2023-12-29T10:00:00-03:00]"
+Agendar cita: "[Agendar cita|2023-12-29T10:00:00-03:00|2023-12-29T11:00:00-03:00|matias@gmail.com]", "[Agendar cita|2023-12-29T10:00:00-03:00|2023-12-29T11:00:00-03:00|matias@gmail.com|RRULE:FREQ=DAILY;COUNT=2]", "[Agendar cita|2023-12-29T10:00:00-03:00|2023-12-29T11:00:00-03:00|matias@gmail.com|RRULE:FREQ=WEEKLY;COUNT=5;BYDAY=TU,FR]"
 Ver calendario del Doctor: "[Listar calendario]"
 Ver calendario de una semana o mes específico: "[Ver calendario=2024-01-05|2024-01-10]"
 Ver disponibilidad de un día específico: "[Ver disponibilidad=2024-01-05]"
@@ -46,25 +47,16 @@ export class AssistantService {
 
   async findAll() {
     const allAssistants = await this.assistantModel.find();
-    // const assistants = await this.apiSession.beta.assistants.list();
     return allAssistants;
-    // return assistants;
   }
 
   async findOne(id: string) {
     const assistants = await this.apiSession.beta.assistants.list();
     const assistant = assistants.data.filter((a) => a.id === id);
-    // const assistant = await this.assistantModel.findById(id);
     return assistant;
   }
 
   async delete(id: string) {
-    // const assistants = await this.apiSession.beta.assistants.list();
-    // for (const assistant of assistants.data) {
-    //   await this.apiSession.beta.assistants.del(assistant.id);
-    //   console.log("Se borro: ", assistant.id);
-    // }
-    // return 'se hizo'
     const assistantDeleted = await this.assistantModel.findByIdAndDelete(id);
     await this.apiSession.beta.assistants.del(assistantDeleted.OpenaiID);
     return assistantDeleted;
@@ -132,48 +124,15 @@ export class AssistantService {
         { type: 'code_interpreter' },
         { type: 'retrieval' },
       ],
-      // max_tokens: 50,
     });
     if (!run) return null;
-    console.log("Llego al MSG")
 
     let messages = await this.apiSession.beta.threads.messages.list(threadId);
 
-    // const maxAttempts = 50;
-    // let attempts = 0;
-    // let actionRes;
-    // if (messages && 'text' in messages.data[0].content[0]) {
-    //   let textContent = messages.data[0].content[0] as MessageContentText;
-    //   console.log('ENtra al IF', String(textContent.text.value));
-    //   while (
-    //     (messages?.data[0]?.role !== 'assistant' ||
-    //     // !textContent?.text?.value ||
-    //     textContent.text.value?.length === 0) &&
-    //     attempts <= maxAttempts
-    //   ) {
-    //     console.log("Entre al while: ", messages?.data[0]?.role, " ", textContent.text.value)
-    //     // Espera un tiempo antes de realizar la siguiente solicitud
-    //     await new Promise((resolve) => setTimeout(resolve, 100));
-    //     // console.log("Entro al while", messages?.data[0]?.role, textContent.text.value)
-    //     // Realiza la solicitud para obtener los mensajes actualizados
-    //     console.log("Entre al while antes del msg")
-    //     messages = await this.apiSession.beta.threads.messages.list(threadId);
-    //     console.log("Entre al while despues del msg")
-
-    //     attempts++;
-    //   }
-    //   if(textContent.text.value?.length){
-    //     console.log("Entro por length value")
-    //     actionRes = await this.actionsCalendar(input.userId, String(textContent.text.value));
-    //   }
-    // }
-    console.log('MESSAGE: ', messages?.data[0].content[0]);
     return {
       assistantId: input.assistantId,
       threadId: run?.thread_id,
       messages: messages?.data[0],
-      // actionResponse: actionRes,
-      // action: Boolean(actionRes),
     };
   }
 
@@ -206,19 +165,9 @@ export class AssistantService {
 
       const actionsContainer = {
         'Agendar cita': async (msg: string) => {
-          const fechaFull = msg.split("=")[1]
-          const [fecha, hora] = fechaFull.split('T');  
-          let [horaSinZona,zonaHoraria] = hora.split('-');  // Eliminar la zona horaria, si existe
-          let [horaActual, minutos, segundos] = horaSinZona.split(':'); 
+          const [actionMsg, fechaFull, fechaEnd, clientEmail, recurrence] = msg.split("|")
 
-          // Convertir la hora a número, sumar una hora y formatear nuevamente
-          let newhoraActual = parseInt(horaActual, 10) + 1;
-          if (newhoraActual < 10) {
-            newhoraActual = Number('0' + newhoraActual);
-          }
-          const fechaEnd = `${fecha}T${newhoraActual}:${minutos}:${segundos}-${zonaHoraria}`
-          console.log(`Acción: Agendar cita para ${fechaFull}`);
-          const event = {
+          const event:any = {
             "summary": "Reunión de prueba creada por assistant",
             "location": "Buenos Aires, Argentina",
             "description": "Esta es una reunión de prueba creada desde la API de Google Calendar.",
@@ -235,7 +184,7 @@ export class AssistantService {
                 "email": user.email
               },
               {
-                "email": "angelvegaxdpro08@gmail.com"
+                "email": clientEmail
               }
             ],
             "reminders": {
@@ -252,8 +201,9 @@ export class AssistantService {
               ]
             }
           }
+          if(recurrence) event.recurrence = [recurrence]; 
+
           let eventCreated = await this.calendarService.createEvent(event, user.id)
-          // return `Acción: Agendar cita para ${fecha}`;
           return eventCreated
         },
         'Ver calendario': async (msg: string) => {
@@ -261,9 +211,11 @@ export class AssistantService {
           console.log(
             `Acción: Ver calendario desde ${inicio} hasta ${fin || inicio}`,
           );
-          return `Acción: Ver calendario desde ${inicio} hasta ${
-            fin || inicio
-          }`;
+          return await this.calendarService.getEvents(user.id, {
+            timeMin: new Date(inicio).toISOString(),
+            timeMax: new Date(fin).toISOString(),
+            maxResults: 50,
+          });
         },
         'Listar calendario': async (msg: string) => {
           console.log(`Acción: Ver calendario`);
@@ -272,51 +224,19 @@ export class AssistantService {
         'Ver disponibilidad': async (msg: string) => {
           const fecha = msg.split('=')[1];
           console.log(`Acción: Ver disponibilidad para ${fecha}`);
-          return `Acción: Ver disponibilidad para ${fecha}`;
+          return await this.calendarService.getEvents(user.id, {
+            timeMin: new Date(fecha).toISOString(),
+            timeMax: new Date(fecha).toISOString(),
+            maxResults: 50,
+          });
         },
       };
 
-      const response = await actionsContainer[oracion.split("=")[0]](match[1]);
+      const response = await actionsContainer[oracion.split("|")[0]](match[1]);
       return response;
 
     } else {
-      console.log('No se encontraron oraciones clave en el mensaje');
       return 'No se encontraron oraciones clave en el mensaje';
     }
   }
 }
-
-// async createThread(input: any) {
-//   const thread = await this.apiSession.beta.threads.create({
-//     messages: [
-//       {
-//         role: 'user',
-//         content: input.content,
-//       },
-//     ],
-//   });
-
-//   return thread;
-// }
-
-// async createMessage(input) {
-//   const message = await this.apiSession.beta.threads.messages.create(
-//     input.threadId,
-//     {
-//       role: 'user',
-//       content: input.content,
-//     },
-//   );
-
-//   return message;
-// }
-
-// async runThread(input: any) {
-//   const run = await this.apiSession.beta.threads.runs.create(input.threadId, {
-//     assistant_id: input.assistantId,
-//     model: 'gpt-4-1106-preview',
-//     // instructions: "additional instructions",
-//     tools: [{ type: 'code_interpreter' }, { type: 'retrieval' }],
-//   });
-//   return run;
-// }

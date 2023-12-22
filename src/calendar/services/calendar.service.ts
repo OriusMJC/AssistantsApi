@@ -5,6 +5,14 @@ import { Model } from 'mongoose';
 import { User } from 'src/schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 
+interface IListEventsFilter {
+  calendarId?: string,
+  timeMin?: string,
+  timeMax?: string,
+  maxResults?: number,
+  singleEvents?: boolean,
+  orderBy?: string,
+}
 @Injectable()
 export class CalendarService {
   private readonly SCOPES = ['https://www.googleapis.com/auth/calendar'];
@@ -71,18 +79,15 @@ export class CalendarService {
     }
   }
 
-  async getEvents(userId?:string): Promise<any[]|string> {
+  async getEvents(userId?:string, filters?:IListEventsFilter): Promise<any[]|string> {
     try {
       // Authorize a client with credentials, then call the Google Calendar API.
-      console.log("Se va a autorizar", userId)
       const authClient = await this.authorize(userId);
-      console.log("Se autorizo")
       //Si es String retorna el Link para obtener Token
       if(typeof authClient === 'string') return authClient;
       
-      console.log("Se va a pedir la list")
       //Sino devuelve la lista
-      return await this.listEvents(authClient);
+      return await this.listEvents(authClient, filters);
     } catch (error) {
       console.error('Error loading client secret file:', error);
       // Handle the error as needed.
@@ -90,18 +95,21 @@ export class CalendarService {
     }
   }
 
-  private async listEvents(auth: OAuth2Client): Promise<any[]> {
+  private async listEvents(auth: OAuth2Client, filters?: IListEventsFilter): Promise<any[]> {
     const calendar = google.calendar({ version: 'v3', auth });
     const responseEvents = [];
-
     try {
-      const res = await calendar.events.list({
+      let params:IListEventsFilter = {
         calendarId: 'primary',
-        timeMin: new Date().toISOString(),
-        maxResults: 10,
-        singleEvents: true,
-        orderBy: 'startTime',
-      });
+        timeMin: filters?.timeMin || new Date().toISOString(),
+        maxResults: filters?.maxResults || 20,
+        singleEvents: filters?.singleEvents || false,
+      };
+      if(filters?.timeMax){
+        params.timeMax = filters.timeMax;
+      }
+      
+      const res = await calendar.events.list(params);
 
       const events = res.data.items;
       if (events.length) {
@@ -130,14 +138,12 @@ export class CalendarService {
       calendarId: 'primary',
       resource: event,
     };
-    console.log("Event para crear: ", event)
     return await calendar.events.insert(newEvent, (err) => {
       if (err) {
-        console.error('There was an error contacting the Calendar service:', err);
         // Handle the error as needed.
         throw new Error('Error contacting the Calendar service');
       }
-      return 'Event created successfully.';
+      return newEvent;
     });
   }
 }
