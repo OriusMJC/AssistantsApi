@@ -20,8 +20,8 @@ Ten en cuenta que para la agenda de citas en los datos de frecuencia tienes que 
 
 Agendar cita: "[Agendar cita|2023-12-29T10:00:00-03:00|2023-12-29T11:00:00-03:00|matias@gmail.com]", "[Agendar cita|2023-12-29T10:00:00-03:00|2023-12-29T11:00:00-03:00|matias@gmail.com|RRULE:FREQ=DAILY;COUNT=2]", "[Agendar cita|2023-12-29T10:00:00-03:00|2023-12-29T11:00:00-03:00|matias@gmail.com|RRULE:FREQ=WEEKLY;COUNT=5;BYDAY=TU,FR]"
 Ver calendario del Doctor: "[Listar calendario]"
-Ver calendario de una semana o mes específico: "[Ver calendario=2024-01-05|2024-01-10]"
-Ver disponibilidad de un día específico: "[Ver disponibilidad=2024-01-05]"
+Ver calendario de una semana o mes específico: "[Ver calendario|2024-01-05|2024-01-10]"
+Ver disponibilidad de un día específico: "[Ver disponibilidad|2024-01-05]"
 En caso de que el usuario no proporcione la información necesaria para realizar la acción específica, tu respuesta debe incluir una solicitud o pregunta dirigida a obtener dicha información.
 `;
 @Injectable()
@@ -159,6 +159,7 @@ export class AssistantService {
     message: string,
   ): Promise<string | any[]> {
     const match = message.match(/\[(.*?)\]/);
+    console.log("MAtch: ", match)
     if (match) {
       const oracion = match[1];
       const user = await this.userModel.findById(userId);
@@ -207,7 +208,7 @@ export class AssistantService {
           return eventCreated
         },
         'Ver calendario': async (msg: string) => {
-          const [inicio, fin] = msg.split('=')[1].split('|');
+          const [msgNone, inicio, fin] = msg.split('|');
           console.log(
             `Acción: Ver calendario desde ${inicio} hasta ${fin || inicio}`,
           );
@@ -222,7 +223,7 @@ export class AssistantService {
           return await this.calendarService.getEvents(user.id);
         },
         'Ver disponibilidad': async (msg: string) => {
-          const fecha = msg.split('=')[1];
+          const fecha = msg.split('|')[1];
           console.log(`Acción: Ver disponibilidad para ${fecha}`);
           return await this.calendarService.getEvents(user.id, {
             timeMin: new Date(fecha).toISOString(),
@@ -231,7 +232,7 @@ export class AssistantService {
           });
         },
       };
-
+      console.log("Oracion:", oracion)
       const response = await actionsContainer[oracion.split("|")[0]](match[1]);
       return response;
 
