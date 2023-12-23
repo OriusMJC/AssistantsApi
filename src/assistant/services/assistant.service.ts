@@ -18,11 +18,13 @@ Y si quiere agendar una cita es necesario la fecha, hora, y email del paciente. 
 A continuación, se presentan las palabras clave para diversas situaciones, junto con ejemplos de las oraciones específicas que deberías devolver
 Ten en cuenta que para la agenda de citas en los datos de frecuencia tienes que crear el dato en base a lo que haya pedido el usuario y basandote en la documentacion de Google Calendar para crear la estructura como en los ejemplos:
 
-Agendar cita: "[Agendar cita|2023-12-29T10:00:00-03:00|2023-12-29T11:00:00-03:00|matias@gmail.com]", "[Agendar cita|2023-12-29T10:00:00-03:00|2023-12-29T11:00:00-03:00|matias@gmail.com|RRULE:FREQ=DAILY;COUNT=2]", "[Agendar cita|2023-12-29T10:00:00-03:00|2023-12-29T11:00:00-03:00|matias@gmail.com|RRULE:FREQ=WEEKLY;COUNT=5;BYDAY=TU,FR]"
+Agendar cita: "[Agendar cita|2023-12-29T10:00:00-03:00|2023-12-29T11:00:00-03:00|matias@gmail.com|Titulo de la cita|Ubicacion de la cita|Time zone como en la documentacion]", "[Agendar cita|2023-12-29T10:00:00-03:00|2023-12-29T11:00:00-03:00|matias@gmail.com|Titulo de la cita|Ubicacion de la cita|Time zone como en la documentacion|RRULE:FREQ=DAILY;COUNT=2]", "[Agendar cita|2023-12-29T10:00:00-03:00|2023-12-29T11:00:00-03:00|matias@gmail.com|Titulo de la cita|Ubicacion de la cita|Time zone como en la documentacion|RRULE:FREQ=WEEKLY;COUNT=5;BYDAY=TU,FR]"
 Ver calendario del Doctor: "[Listar calendario]"
 Ver calendario de una semana o mes específico: "[Ver calendario|2024-01-05|2024-01-10]"
 Ver disponibilidad de un día específico: "[Ver disponibilidad|2024-01-05]"
+
 En caso de que el usuario no proporcione la información necesaria para realizar la acción específica, tu respuesta debe incluir una solicitud o pregunta dirigida a obtener dicha información.
+Este es un ejemplo de timeZone para la accion de Agendar cita: "America/Argentina/Buenos_Aires"
 `;
 @Injectable()
 export class AssistantService {
@@ -166,19 +168,19 @@ export class AssistantService {
 
       const actionsContainer = {
         'Agendar cita': async (msg: string) => {
-          const [actionMsg, fechaFull, fechaEnd, clientEmail, recurrence] = msg.split("|")
+          const [actionMsg, fechaFull, fechaEnd, clientEmail,eventTitle, eventLocation, timeZone, recurrence] = msg.split("|")
 
           const event:any = {
-            "summary": "Reunión de prueba creada por assistant",
-            "location": "Buenos Aires, Argentina",
+            "summary": eventTitle || "Reunión de creada por assistant",
+            "location": eventLocation || "Buenos Aires, Argentina",
             "description": "Esta es una reunión de prueba creada desde la API de Google Calendar.",
             "start": {
               "dateTime": fechaFull,
-              "timeZone": "America/Argentina/Buenos_Aires"
+              "timeZone": timeZone || "America/Argentina/Buenos_Aires"
             },
             "end": {
               "dateTime": fechaEnd,
-              "timeZone": "America/Argentina/Buenos_Aires"
+              "timeZone": timeZone || "America/Argentina/Buenos_Aires"
             },
             "attendees": [
               {
