@@ -36,26 +36,13 @@ $ npm install
 
 ```bash
 # development
-$ npm run start
+$ npm run dev
 
 # watch mode
 $ npm run start:dev
 
 # production mode
 $ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
 ```
 
 ## Support
@@ -72,7 +59,140 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 Nest is [MIT licensed](LICENSE).
 
-## Assistant
+<br>
+<br>
+<br>
+
+## User 🧑‍⚕️
+
+### Crear usuario doctor
+
+**POST** `/user`
+
+❗Antes de crear un usuario, **OBLIGATORIAMENTE** necesitas las credenciales de Google Calendar la cual optienes siguiendo los pasos de esta [Guía de Google Calendar](https://developers.google.com/calendar/api/quickstart/nodejs?hl=es-419)
+
+Sigue esta guía hasta poder descargar las credenciales.
+Copia y pega los valores como en el siguiente ejemplo.
+
+Ejemplo de body obligatorio:
+
+```
+  {
+    "name": "nombre del doctor",
+    "email": "email del doctor",
+    "GCCredentials": {
+      "web": {
+        "client_id": string,
+        "project_id": string,
+        "auth_uri": string,
+        "token_uri": string,
+        "auth_provider_x509_cert_url": string,
+        "client_secret": string,
+        "redirect_uris": string[],
+        "javascript_origins": string[]
+      }
+    }
+  }
+```
+
+Parametros opcionales o que se cargan automaticamente después de seguir los pasos al crear un `Assistant` o conectar con `Calendar`:
+
+```
+  {
+    "GCToken": {
+      "access_token": string,
+      "refresh_token": string,
+      "scope": string,
+      "token_type": string,
+      "expiry_date": number
+    },
+    "AssistantIDs": string[];
+  }
+```
+
+### Obtener TODOS los usuarios
+
+**GET** `/user`
+
+### Obtener un usuario en específico
+
+**GET** `/user/:userId`
+
+### Eliminar un usuario en específico
+
+**DELETE** `/user/:userId`
+
+### Modificar un usuario en específico
+
+**PUT** `/user/:userId`
+
+`Mismos valores que para crear un usuario`
+
+<br>
+<br>
+<br>
+
+## Calendar: 📅
+
+### GET Calendar:
+
+**GET** a ``` /calendar/:userId ```
+
+si es la primera vez que el usuario Doctor hace peticion del Calendar significa que no tiene el Totke. Si no tenes el token de Calendar activado entonces ese Endpoint te devuelve un **URL**
+
+entras a la **URL** y aceptas los permisos con tu cuenta de Google. 
+
+Eso devolverá un codigo el cual tienes que insertar en un **POST** a:
+``` /calendar/token?userId={userID}&code={codigo} ``` y esto guardará el Token.
+
+Ahora puedes hacer un **GET** a ``` /calendar/:userId ``` y te devolverá la lista de eventos del Doctor usuario.
+
+### POST Event
+
+Para postear un Evento haz un **POST** a ``` /calendar/event/:userId ``` y este un ejemplo del **JSON** que hay que enviar por **BODY**:
+
+```
+{
+  "summary": "Reunión de prueba 3",
+  "location": "Buenos Aires, Argentina",
+  "description": "Esta es una reunión de prueba creada desde la API de Google Calendar.",
+  "start": {
+    "dateTime": "2023-12-29T10:00:00-03:00",
+    "timeZone": "America/Argentina/Buenos_Aires"
+  },
+  "end": {
+    "dateTime": "2023-12-29T11:00:00-03:00",
+    "timeZone": "America/Argentina/Buenos_Aires"
+  },
+  "attendees": [
+    {
+      "email": "matiasjesuscontreras12@gmail.com"
+    },
+		{
+      "email": "angelvegaxdpro08@gmail.com"
+    }
+  ],
+  "reminders": {
+    "useDefault": false,
+    "overrides": [
+      {
+        "method": "email",
+        "minutes": 5
+      },
+      {
+        "method": "popup",
+        "minutes": 10
+      }
+    ]
+  }
+}
+```
+
+<br>
+<br>
+<br>
+
+## Assistant 🤖
 
 ### Crear un asistente
 
@@ -134,62 +254,3 @@ Tienes que reemplazar ```threadId``` y ```userId``` por los valores correspondie
 **GET** a ```/assistant/:assistantId``` 
 
 ❗ID del asistente no obligatorio
-
-
-
-
-## Calendar: 
-
-### GET Calendar:
-
-**GET** a ``` /calendar/:userId ```
-
-si es la primera vez que el usuario Doctor hace peticion del Calendar significa que no tiene el Totke. Si no tenes el token de Calendar activado entonces ese Endpoint te devuelve un **URL**
-
-entras a la **URL** y aceptas los permisos con tu cuenta de Google. 
-
-Eso devolverá un codigo el cual tienes que insertar en un **POST** a:
-``` /calendar/token?userId={userID}&code={codigo} ``` y esto guardará el Token.
-
-Ahora puedes hacer un **GET** a ``` /calendar/:userId ``` y te devolverá la lista de eventos del Doctor usuario.
-
-### POST Event
-
-Para postear un Evento haz un **POST** a ``` /calendar/event/:userId ``` y este un ejemplo del **JSON** que hay que enviar por **BODY**:
-
-```
-{
-  "summary": "Reunión de prueba 3",
-  "location": "Buenos Aires, Argentina",
-  "description": "Esta es una reunión de prueba creada desde la API de Google Calendar.",
-  "start": {
-    "dateTime": "2023-12-29T10:00:00-03:00",
-    "timeZone": "America/Argentina/Buenos_Aires"
-  },
-  "end": {
-    "dateTime": "2023-12-29T11:00:00-03:00",
-    "timeZone": "America/Argentina/Buenos_Aires"
-  },
-  "attendees": [
-    {
-      "email": "matiasjesuscontreras12@gmail.com"
-    },
-		{
-      "email": "angelvegaxdpro08@gmail.com"
-    }
-  ],
-  "reminders": {
-    "useDefault": false,
-    "overrides": [
-      {
-        "method": "email",
-        "minutes": 5
-      },
-      {
-        "method": "popup",
-        "minutes": 10
-      }
-    ]
-  }
-}
-```
