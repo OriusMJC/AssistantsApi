@@ -17,9 +17,7 @@ export class UserService {
   }
 
   async createUser(createUser:CreateUserDTO){
-    console.log("USER : ", createUser);
     const createdUser = await this.userModel.create(createUser);
-    console.log("NEW USER : ", createdUser);
     return createdUser;
   }
 

@@ -95,8 +95,6 @@ export class AssistantService {
     console.log("Llego al thread")
     if (!threadId) {
       // Si no hay un ID de hilo, crea un nuevo hilo
-      console.log("Llego al thread IF NO HAY")
-
       const thread = await this.apiSession.beta.threads.create({
         messages: [
           {
@@ -105,12 +103,7 @@ export class AssistantService {
           },
         ],
       });
-      console.log("Llego al thread IF NO HAY CREADO")
       threadId = thread.id;
-      // console.log("Llega hasta aca", threadId)
-      // const newThread:CreateThreadDTO = {threadId: threadId, userId: input.userId, assistantId: input.assistantId};
-      // let threadDb = await this.threadModel.create(newThread)
-      // console.log("Y tmb Llega hasta aca", threadDb)
     } else {
       // Si hay un ID de hilo, agrega el nuevo mensaje al hilo existente
       let res = await this.apiSession.beta.threads.messages.create(threadId, {
@@ -143,7 +136,6 @@ export class AssistantService {
       thread_id,
     );
     let actionRes;
-    console.log("Messageeee: ", messages.data[0]?.content[0]?.['text']?.value)
     if (userId)
       actionRes = await this.actionsCalendar(
         userId,
@@ -161,7 +153,6 @@ export class AssistantService {
     message: string,
   ): Promise<string | any[]> {
     const match = message.match(/\[(.*?)\]/);
-    console.log("MAtch: ", match)
     if (match) {
       const oracion = match[1];
       const user = await this.userModel.findById(userId);
@@ -234,7 +225,6 @@ export class AssistantService {
           });
         },
       };
-      console.log("Oracion:", oracion)
       const response = await actionsContainer[oracion.split("|")[0]](match[1]);
       return response;
 

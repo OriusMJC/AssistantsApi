@@ -28,13 +28,6 @@ export class Assistant {
   })
   description: string;
 
-  // @Prop({
-  //   unique: true,
-  //   required: true,
-  //   trim: true,
-  // })
-  // GoogleCalendarID: string;
-
   @Prop({
     unique: true,
     required: true,

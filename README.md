@@ -63,6 +63,20 @@ Nest is [MIT licensed](LICENSE).
 <br>
 <br>
 
+## ENV
+
+### Variables de entorno importantes
+
+```
+ENV=development
+PORT=3000
+APP_KEY=test
+
+MONGODB_URI=mongodb://localhost/AssistantsApi
+
+OPENAI_API_KEY=sk...
+```
+
 ## User 🧑‍⚕️
 
 ### Crear usuario doctor
@@ -88,12 +102,19 @@ Ejemplo de body obligatorio:
         "token_uri": string,
         "auth_provider_x509_cert_url": string,
         "client_secret": string,
-        "redirect_uris": string[],
-        "javascript_origins": string[]
+        "redirect_uris": [
+          "http://localhost:3000/calendar/oauth2callback?app-key=test"
+        ],
+        "javascript_origins": [
+          "http://localhost",
+          "http://localhost:3000"
+        ]
       }
     }
   }
 ```
+
+❗IMPORTANTE: EN redirects_uris es importante que luego del dominio este "0/calendar/oauth2callback" ya que es la url que crea calendar para la redireccion.
 
 Parametros opcionales o que se cargan automaticamente después de seguir los pasos al crear un `Assistant` o conectar con `Calendar`:
 
