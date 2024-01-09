@@ -141,8 +141,15 @@ export class AssistantService {
         userId,
         String(messages.data[0]?.content[0]?.['text']?.value),
       );
+    const regex = /\[.*?\]/g;
+    const messageText = String(messages.data[0]?.content[0]?.['text']?.value);
+    const extractedText = messageText.replace(regex, '').trim();
+
+    if(messages.data[0]?.content[0]?.['text']?.value){
+      messages.data[0].content[0]['text'].value = extractedText;
+    }
     return {
-      messages: messages,
+      messages: messages.data,
       actionResponse: actionRes,
       action: Boolean(actionRes),
     };

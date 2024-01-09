@@ -29,6 +29,7 @@ export class CalendarService {
     const actualUser = this.actualUser
     const credentials = actualUser.GCCredentials
     if(!actualUser) return 'No se pudo encontrar al Usuario'
+    if(!actualUser.GCToken?.access_token) return await this.getNewToken();
     try {
       this.auth = new google.auth.OAuth2(credentials.web.client_id, credentials.web.client_secret, credentials.web.redirect_uris[0]);
       const tokenContent = JSON.stringify(actualUser?.GCToken);
@@ -123,9 +124,19 @@ export class CalendarService {
         console.log('No upcoming events found.');
       }
     } catch (error) {
-      console.error('The API returned an error:', error);
-      // Handle the error as needed.
-      throw new Error('Error calling Google Calendar API');
+      if (error.code === '400') {
+        auth.refreshAccessToken((err, tokens) => {
+          if (err) {
+            console.error('Error al refrescar el token:', err);
+            throw err;
+          }
+          auth.setCredentials(tokens);
+          return this.listEvents(auth, filters);
+        });
+      } else {
+        console.error('La API devolvió un error:', error);
+        throw new Error('Error al llamar a la API de Google Calendar');
+      }
     }
 
     return responseEvents;
@@ -140,7 +151,6 @@ export class CalendarService {
     };
     return await calendar.events.insert(newEvent, (err) => {
       if (err) {
-        // Handle the error as needed.
         throw new Error('Error contacting the Calendar service');
       }
       return newEvent;
